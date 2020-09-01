@@ -1,5 +1,6 @@
 package com.baidu.shop.entity;
 
+import com.baidu.shop.validata.group.BaiduOperation;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,24 +23,24 @@ public class CategoryEntity {
 
     @Id
     @ApiModelProperty(value = "主键",example = "1")
-    @NotNull(message = "不能为空id")
+    @NotNull(message = "不能为空id",groups = BaiduOperation.Update.class)
     private Integer id;
 
 
     @ApiModelProperty(value = "name")
-    @NotEmpty(message = "不能为空 name")
+    @NotEmpty(message = "不能为空 name",groups = {BaiduOperation.Add.class})
     private String name;
 
     @ApiModelProperty(value = "父级分类",example = "1")
-    @NotNull(message = "不能为空 parentId")
+    @NotNull(message = "不能为空 parentId",groups = {})
     private Integer parentId;
 
     @ApiModelProperty(value = "是否是父级节点",example = "1")
-    @NotNull(message = "不能为空 isParent")
+    @NotNull(message = "不能为空 isParent",groups = {BaiduOperation.Add.class,BaiduOperation.Update.class})
     private Integer isParent;
 
 
-    @NotNull(message = "不能为空 sort")
+    @NotNull(message = "不能为空排序 sort",groups = {BaiduOperation.Add.class,BaiduOperation.Update.class})
     @ApiModelProperty(value = "排序",example = "1")
     private Integer sort;
 

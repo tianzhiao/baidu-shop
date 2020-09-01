@@ -14,7 +14,7 @@ spring:
     # 数据库连接密码
     password: root
     # 驱动名称
-    driver-class-name: com.mysql.cj.jdbc.NonRegisteringDriver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     # boot2.0+使用hikari作为默认数据库连接池
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -46,4 +46,4 @@ logging:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://127.0.0.1:8761/eureka/

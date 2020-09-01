@@ -13,4 +13,10 @@ public class HTTPStatus {
     public static final Integer OK = 200;
 
     public static final Integer ERROR = 500;//失败
+
+
+    /**
+     * 表示 参数 验证失败
+     */
+    public static final Integer PARAMS_VALIDATE_ERROR = 40000;
 }
