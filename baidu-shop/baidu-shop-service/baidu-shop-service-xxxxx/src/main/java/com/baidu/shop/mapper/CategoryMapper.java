@@ -1,7 +1,10 @@
 package com.baidu.shop.mapper;
 
 import com.baidu.shop.entity.CategoryEntity;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
@@ -18,4 +21,5 @@ public interface CategoryMapper extends Mapper<CategoryEntity> {
 
     @Select("select c.name,c.id from tb_category c where c.id in (select tb.category_id from tb_category_brand tb where tb.brand_id = #{brandId})")
     List<CategoryEntity> getByBrand(Integer brandId);
+
 }

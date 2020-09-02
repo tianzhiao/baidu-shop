@@ -48,12 +48,12 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
         Example example = new Example(BrandEntity.class);
 
-        if(brandDTO.getDescending() != null) example
+        if (brandDTO.getDescending() != null) example
                 .setOrderByClause(brandDTO.getOrderByClause());
 
         if (null != brandDTO.getName() && !"".equals(brandDTO.getName()))
             example.createCriteria()
-                    .andLike("name","%" + brandDTO.getName() + "%");
+                    .andLike("name", "%" + brandDTO.getName() + "%");
 
         List<BrandEntity> brandEntities = brandMapper.selectByExample(example);
 
@@ -81,7 +81,9 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
         //将关系存储到数据库
 
-        if(brandDTO.getCategory().contains(",")){
+        this.insertCategoryAndBrand(brandDTO,brandEntity);
+
+      /*  if (brandDTO.getCategory().contains(",")) {
 
             //brandDTO.getCategory().split(",") 分割字符串返回数组
             //Arrays.asList(brandDTO.getCategory().split(",")) 把数组放到List集合中
@@ -103,7 +105,7 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
             //批量新增 mapper 需要继承 InsertListMapper <T>
             categoryBrandMapper.insertList(collect);
 
-        }else{
+        } else {
 
             CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
 
@@ -113,8 +115,7 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
             categoryBrandMapper.insertSelective(categoryBrandEntity);
         }
-
-
+*/
 
         return this.setResultSuccess();
     }
@@ -125,7 +126,7 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
         BrandEntity brandEntity = BaiduBeanUtil.copyProperties(brandDTO, BrandEntity.class);
 
-        brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().charAt(0)),PinyinUtil.TO_FIRST_CHAR_PINYIN).charAt(0));
+        brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().charAt(0)), PinyinUtil.TO_FIRST_CHAR_PINYIN).charAt(0));
 
         brandMapper.updateByPrimaryKeySelective(brandEntity);
 
@@ -134,11 +135,13 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
         Example example = new Example(CategoryBrandEntity.class);
 
         //通过 brandId 主键删除关系表中的数据
-        example.createCriteria().andEqualTo("brandId",brandDTO.getId());
+        example.createCriteria().andEqualTo("brandId", brandDTO.getId());
 
         categoryBrandMapper.deleteByExample(example);
 
-        if(brandDTO.getCategory().contains(",")){
+        this.insertCategoryAndBrand(brandDTO,brandEntity);
+
+        /*if (brandDTO.getCategory().contains(",")) {
 
             //批量增
             List<CategoryBrandEntity> collect = Arrays.asList(brandDTO.getCategory().split(",")).stream().map(v -> {
@@ -155,7 +158,68 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
             categoryBrandMapper.insertList(collect);
 
-        }else{
+        } else {
+            //单个增
+
+            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+
+            categoryBrandEntity.setBrandId(brandEntity.getId());
+
+            categoryBrandEntity.setCategoryId(StringUtil.paramsInteger(brandDTO.getCategory()));
+
+            categoryBrandMapper.insertSelective(categoryBrandEntity);
+        }*/
+
+        return this.setResultSuccess();
+    }
+
+    /**
+     * 删除
+     * @param id
+     * @return
+     */
+
+    @Transactional
+    @Override
+    public Result<JsonObject> delete(Integer id) {
+
+        brandMapper.deleteByPrimaryKey(id);
+
+        this.deleteCategoryAndBrand(id);
+
+        return this.setResultSuccess();
+    }
+
+    private void deleteCategoryAndBrand(Integer id){
+
+        Example example = new Example(CategoryBrandEntity.class);
+
+        //通过 brandId 主键删除关系表中的数据
+        example.createCriteria().andEqualTo("brandId", id);
+
+        categoryBrandMapper.deleteByExample(example);
+    }
+
+
+    private void insertCategoryAndBrand(BrandDTO brandDTO, BrandEntity brandEntity){
+        if (brandDTO.getCategory().contains(",")) {
+
+            //批量增
+            List<CategoryBrandEntity> collect = Arrays.asList(brandDTO.getCategory().split(",")).stream().map(v -> {
+
+                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+
+                categoryBrandEntity.setBrandId(brandEntity.getId());
+
+                categoryBrandEntity.setCategoryId(StringUtil.paramsInteger(v));
+
+                return categoryBrandEntity;
+
+            }).collect(Collectors.toList());
+
+            categoryBrandMapper.insertList(collect);
+
+        } else {
             //单个增
 
             CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
@@ -166,7 +230,5 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
             categoryBrandMapper.insertSelective(categoryBrandEntity);
         }
-
-        return this.setResultSuccess();
     }
 }
