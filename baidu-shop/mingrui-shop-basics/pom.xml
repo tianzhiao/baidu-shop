@@ -16,6 +16,7 @@
     <modules>
         <module>baidu-eureka-server</module>
         <module>baidu-shop-basic-zuul-serer</module>
+        <module>baidu-shop-basic-upload-server</module>
     </modules>
 
 

@@ -95,4 +95,12 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
 
         return this.setResultSuccess();
     }
+
+
+    @Override
+    public Result<List<CategoryEntity>> getByBrand(Integer brandId) {
+
+        List<CategoryEntity> list = mapper.getByBrand(brandId);
+        return this.setResultSuccess(list);
+    }
 }

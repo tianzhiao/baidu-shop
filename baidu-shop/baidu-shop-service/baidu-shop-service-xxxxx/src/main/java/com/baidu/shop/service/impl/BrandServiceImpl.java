@@ -100,7 +100,7 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
                 return categoryBrandEntity;
 
             }).collect(Collectors.toList());
-
+            //批量新增 mapper 需要继承 InsertListMapper <T>
             categoryBrandMapper.insertList(collect);
 
         }else{
@@ -115,6 +115,57 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
         }
 
 
+
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JsonObject> edit(BrandDTO brandDTO) {
+
+        BrandEntity brandEntity = BaiduBeanUtil.copyProperties(brandDTO, BrandEntity.class);
+
+        brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().charAt(0)),PinyinUtil.TO_FIRST_CHAR_PINYIN).charAt(0));
+
+        brandMapper.updateByPrimaryKeySelective(brandEntity);
+
+        //之前删除关系表中的数据
+
+        Example example = new Example(CategoryBrandEntity.class);
+
+        //通过 brandId 主键删除关系表中的数据
+        example.createCriteria().andEqualTo("brandId",brandDTO.getId());
+
+        categoryBrandMapper.deleteByExample(example);
+
+        if(brandDTO.getCategory().contains(",")){
+
+            //批量增
+            List<CategoryBrandEntity> collect = Arrays.asList(brandDTO.getCategory().split(",")).stream().map(v -> {
+
+                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+
+                categoryBrandEntity.setBrandId(brandEntity.getId());
+
+                categoryBrandEntity.setCategoryId(StringUtil.paramsInteger(v));
+
+                return categoryBrandEntity;
+
+            }).collect(Collectors.toList());
+
+            categoryBrandMapper.insertList(collect);
+
+        }else{
+            //单个增
+
+            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+
+            categoryBrandEntity.setBrandId(brandEntity.getId());
+
+            categoryBrandEntity.setCategoryId(StringUtil.paramsInteger(brandDTO.getCategory()));
+
+            categoryBrandMapper.insertSelective(categoryBrandEntity);
+        }
 
         return this.setResultSuccess();
     }

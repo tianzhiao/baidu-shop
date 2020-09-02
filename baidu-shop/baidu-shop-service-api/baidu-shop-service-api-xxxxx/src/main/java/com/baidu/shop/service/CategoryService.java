@@ -25,6 +25,10 @@ public interface CategoryService {
     @GetMapping("/cat/list")
     Result<List<CategoryEntity>> getcategoryByParentId(Integer id);
 
+    @ApiOperation(value = "CategoryService 查询商品分类")
+    @GetMapping("/cat/getByBrand")
+    Result<List<CategoryEntity>> getByBrand(Integer brandId);
+
 
     @ApiOperation(value = "CategoryService 新增")
     @PostMapping("/cat/save")     // {BaiduOperation.Add.class} 表示只验证 这个组的
