@@ -1,6 +1,6 @@
 package com.baidu.shop.mapper;
 
-import com.baidu.shop.entity.SpecificationEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
 import tk.mybatis.mapper.common.Mapper;
 
 /**
@@ -11,5 +11,5 @@ import tk.mybatis.mapper.common.Mapper;
  * @Version V1.09999999999999999
  **/
 
-public interface SpecificationMapper extends Mapper<SpecificationEntity> {
+public interface SpecGroupMapper extends Mapper<SpecGroupEntity> {
 }

@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
  * @Version V1.09999999999999999
  **/
 @ApiModel(value = "规格参数的分组表，每个商品分类下有多个规格参数组")
-public class SpecificationDTO {
+public class SpecGroupDTO {
 
     @ApiModelProperty(value = "主键",example = "1")
     @NotNull(message = "主键不能为空",groups = BaiduOperation.Update.class)

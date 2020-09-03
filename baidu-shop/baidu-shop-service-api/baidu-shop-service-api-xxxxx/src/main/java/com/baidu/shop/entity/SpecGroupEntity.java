@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Table(name = "tb_spec_group")
-public class SpecificationEntity {
+public class SpecGroupEntity {
 
     @Id
     private  Integer id;

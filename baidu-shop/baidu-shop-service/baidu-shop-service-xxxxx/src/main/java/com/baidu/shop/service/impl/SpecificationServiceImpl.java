@@ -2,12 +2,16 @@ package com.baidu.shop.service.impl;
 
 import com.baidu.shop.base.BeanApiService;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.dto.SpecificationDTO;
-import com.baidu.shop.entity.SpecificationEntity;
-import com.baidu.shop.mapper.SpecificationMapper;
+import com.baidu.shop.dto.SpecGroupDTO;
+import com.baidu.shop.dto.SpecParamsDTO;
+import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpecParamsEntity;
+import com.baidu.shop.mapper.SpecGroupMapper;
+import com.baidu.shop.mapper.SpecParamsMapper;
 import com.baidu.shop.service.SpecificationService;
 import com.baidu.shop.utlis.BaiduBeanUtil;
 import com.google.gson.JsonObject;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
@@ -26,38 +30,83 @@ public class SpecificationServiceImpl extends BeanApiService implements Specific
 
 
     @Resource
-    private SpecificationMapper mapper;
+    private SpecGroupMapper mapper;
+
+    @Resource
+    private SpecParamsMapper paramsMapper;
 
     @Override
-    public Result<List<SpecificationEntity>> list(SpecificationEntity specificationDTO) {
+    public Result<List<SpecGroupEntity>> list(SpecGroupEntity specificationDTO) {
 
-        Example example = new Example(SpecificationEntity.class);
+        Example example = new Example(SpecGroupEntity.class);
 
         if(specificationDTO.getCid() != null) example.createCriteria().andEqualTo("cid",specificationDTO.getCid());
 
-        List<SpecificationEntity> specificationEntities = mapper.selectByExample(example);
+        List<SpecGroupEntity> specificationEntities = mapper.selectByExample(example);
 
         return this.setResultSuccess(specificationEntities);
     }
 
+    @Transactional
     @Override
-    public Result<JsonObject> save(SpecificationDTO specificationDTO) {
+    public Result<JsonObject> save(SpecGroupDTO specGroupDTO) {
 
-        mapper.insertSelective(BaiduBeanUtil.copyProperties(specificationDTO,SpecificationEntity.class));
+        mapper.insertSelective(BaiduBeanUtil.copyProperties(specGroupDTO, SpecGroupEntity.class));
         return this.setResultSuccess();
     }
 
+    @Transactional
     @Override
-    public Result<JsonObject> edit(SpecificationDTO specificationDTO) {
+    public Result<JsonObject> edit(SpecGroupDTO specGroupDTO) {
 
-        mapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specificationDTO,SpecificationEntity.class));
+        mapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specGroupDTO, SpecGroupEntity.class));
         return  this.setResultSuccess();
     }
 
+    @Transactional
     @Override
     public Result<JsonObject> delete(Integer id) {
 
         mapper.deleteByPrimaryKey(id);
+        return this.setResultSuccess();
+    }
+    //************************************params*********************************************//
+
+    @Override
+    public Result<List<SpecParamsEntity>> list(SpecParamsDTO specParamsDTO) {
+
+        if(specParamsDTO.getGroupId() == null) return this.setResultError("无效的ID");
+        Example example = new Example(SpecParamsEntity.class);
+
+        example.createCriteria().andEqualTo("groupId",specParamsDTO.getGroupId());
+        List<SpecParamsEntity> specParamsEntities = paramsMapper.selectByExample(example);
+
+        return this.setResultSuccess(specParamsEntities);
+    }
+
+    @Transactional
+    @Override
+    public Result<JsonObject> save(SpecParamsDTO specParamsDTO) {
+        paramsMapper.insertSelective(BaiduBeanUtil.copyProperties(specParamsDTO,SpecParamsEntity.class));
+
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JsonObject> edit(SpecParamsDTO specParamsDTO) {
+
+        paramsMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specParamsDTO,SpecParamsEntity.class));
+
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JsonObject> delete(Long id) {
+
+        paramsMapper.deleteByPrimaryKey(id);
+
         return this.setResultSuccess();
     }
 }

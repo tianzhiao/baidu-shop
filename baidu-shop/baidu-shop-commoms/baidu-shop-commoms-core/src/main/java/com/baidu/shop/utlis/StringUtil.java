@@ -23,6 +23,11 @@ public class StringUtil {
         return Integer.parseInt(str);
     }
 
+    public static Boolean isIntNotNull(Integer id){
+
+        return null != id && 0 != id;
+    }
+
 
 
 
