@@ -10,6 +10,7 @@ import com.baidu.shop.mapper.SpecGroupMapper;
 import com.baidu.shop.mapper.SpecParamsMapper;
 import com.baidu.shop.service.SpecificationService;
 import com.baidu.shop.utlis.BaiduBeanUtil;
+import com.baidu.shop.utlis.ObjectUtil;
 import com.google.gson.JsonObject;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,8 +67,10 @@ public class SpecificationServiceImpl extends BeanApiService implements Specific
     @Transactional
     @Override
     public Result<JsonObject> delete(Integer id) {
-
-        mapper.deleteByPrimaryKey(id);
+        Example example = new Example(SpecParamsEntity.class);
+        example.createCriteria().andEqualTo("groupId",id);
+        List<SpecParamsEntity> specParamsEntities = paramsMapper.selectByExample(example);
+        if(!ObjectUtil.isNotEmpty(specParamsEntities)) mapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }
     //************************************params*********************************************//

@@ -10,10 +10,20 @@ eureka:
 
 
 
+fdfs:
+  so-timeout: 1501
+  connect-timeout: 800
+  thumb-image: # 缩略图
+    width: 60
+    height: 60
+  tracker-list: # tracker地址
+    - 101.200.56.190:22122
+
 mingrui:
   upload:
     path:
       windows: T:\\images
       linux: /sss/images
     img:
-      host: http:\\image.baidushop.com
+#      host: http:\\image.baidushop.com
+      host: http://101.200.56.190/

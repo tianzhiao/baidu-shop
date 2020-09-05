@@ -34,7 +34,7 @@ public class UpdateController extends BeanApiService {
     @Value(value = "${mingrui.upload.img.host}")
     private String imgHost;
 
-    @PostMapping("/upload")
+    @PostMapping("/uploadsss")
     public Result<String> uploadImg(@RequestParam("file") MultipartFile file) {
 
         if(file.isEmpty()) return this.setResultError("上传的文件为空");//判断上传的文件是否为空
