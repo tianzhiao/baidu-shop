@@ -64,13 +64,17 @@ public class SpecificationServiceImpl extends BeanApiService implements Specific
         return  this.setResultSuccess();
     }
 
+    String msg = "";
+
     @Transactional
     @Override
     public Result<JsonObject> delete(Integer id) {
+        msg = "";
         Example example = new Example(SpecParamsEntity.class);
         example.createCriteria().andEqualTo("groupId",id);
         List<SpecParamsEntity> specParamsEntities = paramsMapper.selectByExample(example);
         if(!ObjectUtil.isNotEmpty(specParamsEntities)) mapper.deleteByPrimaryKey(id);
+        else this.setResultError("被 " + specParamsEntities.get(0).getName() + " 绑定，不能删除");
         return this.setResultSuccess();
     }
     //************************************params*********************************************//

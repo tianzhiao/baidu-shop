@@ -16,4 +16,12 @@ public class ObjectUtil {
 
         return list != null && list.size() != 0;
     }
+
+
+    public static Boolean isNotNull(Integer str){
+
+        return null != str && !"".equals(str);
+    }
+
+
 }

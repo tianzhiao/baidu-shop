@@ -92,6 +92,16 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
     public Result<JSONObject> save(Integer id) {
 
 
+
+        CategoryEntity categoryEntity = mapper.selectByPrimaryKey(id);
+        if(null == categoryEntity){//创建
+            return this.setResultError("没有-id");
+        }
+        if(categoryEntity.getIsParent() == 1){
+            return this.setResultError("父级节点不能被删除");
+        }
+
+
         //通过 分组ID 去查询 中间表，
         //判断 id 是不是空
         if(StringUtil.isIntNotNull(id)){
@@ -113,7 +123,7 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
             }
             //判断 ArrayList<BrandEntity> 是否有值
             if(ObjectUtil.isNotEmpty(brandEntities)){
-                //其实这个可以不写forEach ，因为只会返回一条数据
+                //其实这个可以不写forEach ，因为只会返回一条数据 可以这样写brandEntities.get(0)
                 for (BrandEntity brandEntity : brandEntities) {
                     //拼接字符串
                     msg += " " + brandEntity.getName();
@@ -142,13 +152,7 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
                 return this.setResultError(msg);
             }
         }
-        CategoryEntity categoryEntity = mapper.selectByPrimaryKey(id);
-        if(null == categoryEntity){//创建
-            return this.setResultError("没有-id");
-        }
-        if(categoryEntity.getIsParent() == 1){
-            return this.setResultError("父级节点不能被删除");
-        }
+
         Example example = new Example(CategoryEntity.class);
 		//categoryEntity.getParentId() 是 id
         example.createCriteria().andEqualTo("parentId",categoryEntity.getId());
