@@ -41,7 +41,8 @@ public interface SpecificationService {
     @ApiOperation(value = "delete")
     Result<JsonObject> delete(Integer id);
 
-    @ApiOperation(value = "参数查询")
+    //==============================商品参数======================================
+    @ApiOperation(value = "商品参数查询")
     @GetMapping("/specification/ParamsLoadList")
     Result<List<SpecParamsEntity>> list(SpecParamsDTO specParamsDTO);
 

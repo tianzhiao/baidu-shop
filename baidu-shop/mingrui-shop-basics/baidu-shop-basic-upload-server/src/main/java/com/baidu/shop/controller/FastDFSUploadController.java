@@ -25,7 +25,7 @@ import java.io.InputStream;
  * @Version V1.09999999999999999
  **/
 @RestController
-@RequestMapping(value = "upload")
+@RequestMapping(value = "uploadsss")
 @Slf4j
 public class FastDFSUploadController {
 

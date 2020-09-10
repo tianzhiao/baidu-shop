@@ -155,13 +155,13 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
 
         Example example = new Example(CategoryEntity.class);
 		//categoryEntity.getParentId() 是 id
-        example.createCriteria().andEqualTo("parentId",categoryEntity.getId());
+        example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
         List<CategoryEntity> categoryEntities = mapper.selectByExample(example);
         if(categoryEntities.size() == 1){
-            CategoryEntity categoryEntity1 = mapper.selectByPrimaryKey(categoryEntities.get(0).getParentId());
+
             CategoryEntity categoryEntity2 = new CategoryEntity();
             categoryEntity2.setIsParent(0);
-            categoryEntity2.setId(categoryEntity1.getParentId());
+            categoryEntity2.setId(categoryEntity.getParentId());
             mapper.updateByPrimaryKeySelective(categoryEntity2);
         }
         mapper.deleteByPrimaryKey(id);

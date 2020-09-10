@@ -11,6 +11,7 @@ import com.baidu.shop.mapper.SpecParamsMapper;
 import com.baidu.shop.service.SpecificationService;
 import com.baidu.shop.utlis.BaiduBeanUtil;
 import com.baidu.shop.utlis.ObjectUtil;
+import com.baidu.shop.utlis.StringUtil;
 import com.google.gson.JsonObject;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,10 +83,15 @@ public class SpecificationServiceImpl extends BeanApiService implements Specific
     @Override
     public Result<List<SpecParamsEntity>> list(SpecParamsDTO specParamsDTO) {
 
-        if(specParamsDTO.getGroupId() == null) return this.setResultError("无效的ID");
-        Example example = new Example(SpecParamsEntity.class);
+        //if(specParamsDTO.getGroupId() == null) return this.setResultError("无效的ID");
 
-        example.createCriteria().andEqualTo("groupId",specParamsDTO.getGroupId());
+        Example example = new Example(SpecParamsEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        if(null != specParamsDTO.getGroupId())
+            criteria.andEqualTo("groupId",specParamsDTO.getGroupId());
+        if(null != specParamsDTO.getCid())
+            criteria.andEqualTo("cid",specParamsDTO.getCid());
+
         List<SpecParamsEntity> specParamsEntities = paramsMapper.selectByExample(example);
 
         return this.setResultSuccess(specParamsEntities);

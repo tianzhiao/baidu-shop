@@ -43,4 +43,8 @@ public interface BrandService {
     @ApiOperation(value = "删除接口")
     @DeleteMapping("/brand/delete")
     Result<JsonObject> delete(Integer id);
+
+    @ApiOperation(value = "通过cid 查询")
+    @GetMapping("/item/spec/brand")
+    Result<List<BrandEntity>> list(Integer cid);
 }

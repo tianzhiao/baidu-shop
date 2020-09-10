@@ -5,8 +5,10 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.BrandDTO;
 import com.baidu.shop.entity.BrandEntity;
 import com.baidu.shop.entity.CategoryBrandEntity;
+import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.mapper.BrandMapper;
 import com.baidu.shop.mapper.CategoryBrandMapper;
+import com.baidu.shop.mapper.SpuMapper;
 import com.baidu.shop.service.BrandService;
 import com.baidu.shop.utlis.BaiduBeanUtil;
 import com.baidu.shop.utlis.PinyinUtil;
@@ -40,6 +42,18 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
 
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
+
+    @Resource
+    private SpuMapper spuMapper;
+
+
+    @Override
+    public Result<List<BrandEntity>> list(Integer cid) {
+
+        List<BrandEntity>  list = brandMapper.brandByCategoryId(cid);
+
+        return this.setResultSuccess(list);
+    }
 
     @Override
     public Result<PageInfo<List<BrandEntity>>> getBrandInfo(BrandDTO brandDTO) {
@@ -183,8 +197,14 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
     @Override
     public Result<JsonObject> delete(Integer id) {
 
-        brandMapper.deleteByPrimaryKey(id);
+        Example example = new Example(SpuEntity.class);
+        example.createCriteria().andEqualTo("brandId",id);
+        List<SpuEntity> spuEntities = spuMapper.selectByExample(example);
+        if (spuEntities.size() > 0) {
+            return this.setResultError("不能删除有spu商品绑定");
+        }
 
+        brandMapper.deleteByPrimaryKey(id);
         this.deleteCategoryAndBrand(id);
 
         return this.setResultSuccess();
