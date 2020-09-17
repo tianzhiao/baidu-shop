@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1 th:text="${name}"></h1>
+
+    <h1 th:each="s : ${arr}">
+<!--        <span th:text="${s == 3 ? '垃圾' ? '鸡鸡'}"></span>-->
+    </h1>
+
+    <h1 th:each="demos : ${demo}">
+        <div th:text="${demos.name}"></div>
+       <div th:text="${demos.sex}"></div>
+       <div th:text="${demos.hobby}"></div>
+       <div th:text="${demos.type}"></div>
+       <div th:text="${demos.id}"></div>
+    </h1>
+</body>
+</html>

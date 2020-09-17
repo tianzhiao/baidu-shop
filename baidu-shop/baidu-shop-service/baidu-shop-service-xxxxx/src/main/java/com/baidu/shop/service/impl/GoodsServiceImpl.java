@@ -143,6 +143,25 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     }
 
     @Override
+    public Result<List<SpuDTO>> list2(SpuDTO spuDTO) {
+
+        //if (StringUtil.isIntNotNull(spuDTO.getPage()))spuDTO.setPage((spuDTO.getPage() -1) * spuDTO.getRows());
+        if(StringUtil.isIntNotNull(spuDTO.getRows()) && StringUtil.isIntNotNull(spuDTO.getRows()))
+            PageHelper.startPage(spuDTO.getPage(),spuDTO.getRows());
+
+        List<SpuDTO> listBySpuId = spuMapper.getListBySpuId(spuDTO);
+
+        Integer count = spuMapper.count(spuDTO);
+
+       /* Map<String, Object> map = new HashMap<>();
+        map.put("total",count);
+        map.put("list",listBySpuId);*/
+        return this.setResultSuccess(listBySpuId);
+
+        // return this.setResult(HTTPStatus.OK,"" + count,listBySpuId);
+    }
+
+    @Override
     public Result<SpuDetailEntity> detail(Integer spuId) {
 
         SpuDetailEntity spuDetailEntity = spuDetailMapper.selectByPrimaryKey(spuId);

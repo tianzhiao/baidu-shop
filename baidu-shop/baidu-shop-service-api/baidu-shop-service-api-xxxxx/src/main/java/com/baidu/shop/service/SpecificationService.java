@@ -9,6 +9,7 @@ import com.baidu.shop.validata.group.BaiduOperation;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ import java.util.List;
 @Api(tags = "规范接口")
 public interface SpecificationService {
 
+    //================================分组查询====================================
     @GetMapping("/specification/list")
     @ApiOperation(value = "查寻")
     Result<List<SpecGroupEntity>> list(@Validated({BaiduOperation.Update.class}) SpecGroupEntity specificationDTO);
@@ -44,7 +46,7 @@ public interface SpecificationService {
     //==============================商品参数======================================
     @ApiOperation(value = "商品参数查询")
     @GetMapping("/specification/ParamsLoadList")
-    Result<List<SpecParamsEntity>> list(SpecParamsDTO specParamsDTO);
+    Result<List<SpecParamsEntity>> list(@SpringQueryMap SpecParamsDTO specParamsDTO);
 
     @ApiOperation(value = "参数新增")
     @PostMapping("/specification/ParamsSaveOrUpdate")

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<ul th:each="stu : ${stuList}">
+    <li th:text="${stu.getAge()}"></li>
+    <li th:text="${stu.code}"></li>
+    <li th:text="${stu.likeColor}"></li>
+    <li th:text="${stu.pass}"></li>
+</ul>
+
+<div th:if="${stuList.get(0).getAge() > 9}">www</div>
+<div th:unless="${stuList.get(0).getAge() < 9}">sss</div>
+
+<ul>
+    <li >下标--编码--密码--年龄</li>
+    <li th:each="stu,stat : ${stuList}">
+        <span th:text="${stat.index}"></span>--
+        <span th:text="${stu.code}"></span>--
+        <span th:text="${stu.pass}"></span>--
+        <span th:text="${stu.age}"></span>
+    </li>
+</ul>
+</body>
+<script th:inline="javascript">
+    //预处理js值
+    const  stuList=/*[[${stuList}]]*/;
+    const  stu=/*[[${stuList[0]}]]*/;
+    const  age=/*[[${stuList[0].age}]]*/;
+
+    console.log("集合："+stuList);
+    console.log("对象："+stu);
+    console.log("属性："+age);
+
+    stuList.forEach(stu=>{
+        console.log(stu.code+"   "+stu.pass)
+    })
+
+</script>
+</html>

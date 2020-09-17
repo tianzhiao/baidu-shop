@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- th:指令依赖于h5-->
+你好<span th:text="${stu.code.substring(2).split('')[0]}"></span><br>
+<!--  data-th-text 指令支持非 h5-->
+密码是：<span data-th-text="${stu.getPass()}"></span><br>
+<!--对象['属性值'] 如果变量是动态的，可以用此属性-->
+您的年龄是：<span th:text="${stu['age']}"></span><br>
+<!--对象的value中有html需要渲染的使用 utext 输出-->
+您喜欢的颜色是<span th:utext="${stu.likeColor}"></span>
+
+<h1>============================</h1>
+
+<div th:object="${stu}">
+    <span th:text="*{pass}"></span><br/>
+    <span th:text="*{age}"></span><br/>
+    <span th:text="*{code}"></span><br/>
+    <span th:utext="*{likeColor}"></span><br/>
+</div>
+
+<!--不加 单引号 就可以直接运算-->
+<h4>
+    <span th:text="666 * 7"></span>
+</h4>
+<!--判断-->
+<div th:if="${stu.getAge() > 18}">
+    成年
+</div>
+<!--拼接-->
+<div th:text=" 您好 + ${stu.code}"></div>
+
+<span th:text="|你好${stu.code}真的6666|"></span>
+<!--可以直接使用三部运算-->
+<span th:text=" ${stu.code} * 2 > 18 ? '成年':'未成年'"></span>
+</body>
+</html>

@@ -16,9 +16,16 @@
     <packaging>pom</packaging>
     <modules>
         <module>baidu-shop-service-xxxxx</module>
+        <module>baidu-shop-service-search</module>
     </modules>
 
     <dependencies>
+
+     <!--   <dependency>
+            <groupId>com.baidu</groupId>
+            <artifactId>baidu-shop-commoms-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>-->
 
         <!-- SpringBoot-整合Web组件 -->
         <dependency>

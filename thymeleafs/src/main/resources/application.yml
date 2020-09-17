@@ -1,0 +1,6 @@
+server:
+  port: 5656
+spring:
+  thymeleaf:
+    prefix: classpath:/thymeleaf/
+    cache: false
