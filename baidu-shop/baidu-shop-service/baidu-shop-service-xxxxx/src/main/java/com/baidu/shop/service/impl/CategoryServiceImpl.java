@@ -19,7 +19,9 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName CategoryServiceImpl
@@ -47,6 +49,15 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
 
     @Resource
     private SpecGroupMapper specGroupMapper;
+
+    @Override
+    public Result<List<CategoryEntity>> getCategoryById(String catIdStrs) {
+
+        List<CategoryEntity> categoryEntities = mapper.selectByIdList(Arrays.asList(catIdStrs.split(","))
+                .stream().map(catId -> Integer.parseInt(catId)).collect(Collectors.toList()));
+
+        return this.setResultSuccess(categoryEntities);
+    }
 
     @Override
     public Result<List<CategoryEntity>> getcategoryByParentId(Integer id) {

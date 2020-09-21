@@ -12,6 +12,8 @@
     <artifactId>baidu-shop-service-search</artifactId>
 
     <dependencies>
+
+
         <dependency>
             <groupId>com.baidu</groupId>
             <artifactId>baidu-shop-service-api-search</artifactId>

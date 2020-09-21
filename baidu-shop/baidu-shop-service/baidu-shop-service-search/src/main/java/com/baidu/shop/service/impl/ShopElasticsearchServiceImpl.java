@@ -7,16 +7,33 @@ import com.baidu.shop.document.GoodsDocument;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpecParamsDTO;
 import com.baidu.shop.dto.SpuDTO;
+import com.baidu.shop.entity.BrandEntity;
+import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpecParamsEntity;
 import com.baidu.shop.entity.SpuDetailEntity;
+import com.baidu.shop.feign.BrandFeign;
+import com.baidu.shop.feign.CategoryFeign;
 import com.baidu.shop.feign.SearchFeign;
 import com.baidu.shop.feign.SpecificationFeign;
+import com.baidu.shop.responsoe.GoodsResponse;
 import com.baidu.shop.service.ShopESService;
-import com.baidu.shop.status.HTTPStatus;
+import com.baidu.shop.utlis.ESHighLightUtil;
 import com.baidu.shop.utlis.JSONUtil;
-import com.google.gson.JsonObject;
+import com.baidu.shop.utlis.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpStatus;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.IndexOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -42,12 +59,145 @@ public class ShopElasticsearchServiceImpl extends BeanApiService implements Shop
     @Resource
     private SpecificationFeign specificationFeign;
 
+    @Resource
+    private ElasticsearchRestTemplate elasticsearchRestTemplate;
+
+    @Resource
+    private BrandFeign brandFeign;
+
+    @Resource
+    private CategoryFeign categoryFeign;
+
+    // ctrl + alt + B
+    //ctrl + alt + M
     @Override
-    public Result<JsonObject> test() {
+    public GoodsResponse esSearch(String search,Integer page) {
+
+        if(StringUtil.isEmpty(search))   throw new RuntimeException("search 不能为空");
+
+        //查询
+        SearchHits<GoodsDocument> search1 = elasticsearchRestTemplate.search(this.getSearchQueryBuilder(search,page).build(), GoodsDocument.class);
+        //取分组
+        Aggregations aggregations = search1.getAggregations();
+        //brand 数据
+        List<CategoryEntity> brandList = this.getBrandList(aggregations);
+
+        //category 数据
+        List<BrandEntity> categoryList = this.getCategoryList(aggregations);
+
+        Long page1 = this.getPage(search1.getTotalHits());
+
+        List<GoodsDocument> collect = ESHighLightUtil.getHighLightHit(search1.getSearchHits())
+                .stream().map(thit -> thit.getContent()).collect(Collectors.toList());
+
+        return new GoodsResponse(search1.getTotalHits(),page1,brandList,categoryList,collect);
+    }
+
+    /**
+     * 算出总条数
+     * @param total
+     * @return
+     */
+    private Long getPage(Long total){
+        Double page2 = Math.ceil(total.doubleValue() / 10);
+        Long totalPage = page2.longValue();
+        return totalPage;
+    }
+
+    /**
+     * 构建查询
+     * @param search
+     * @param page
+     * @return
+     */
+
+    private NativeSearchQueryBuilder getSearchQueryBuilder(String search,Integer page){
+
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+
+        nativeSearchQueryBuilder.withQuery(QueryBuilders.multiMatchQuery(search,"title","categoryName","brandName"));
+
+        nativeSearchQueryBuilder.withHighlightBuilder(ESHighLightUtil.getHighlightBuilder("title"));
+
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("brandId_agg").field("brandId"));
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("categoryId_agg").field("cid3"));
+
+        nativeSearchQueryBuilder.withPageable(PageRequest.of(page -1,10));
+
+        return nativeSearchQueryBuilder;
+
+    }
+
+    /**
+     * 查询 category 数据
+     * @param aggregations
+     * @return
+     */
+
+    private List<BrandEntity> getCategoryList(Aggregations aggregations){
+
+        Terms brandId_agg = aggregations.get("brandId_agg");
+        List<String> brandIdList = brandId_agg.getBuckets()
+                .stream().map(brandId -> brandId.getKeyAsString()).collect(Collectors.toList());
+
+        //根据brandId 去查询 BrandList
+        //将list集合转换成 用 逗号分隔的字符串
+        Result<List<BrandEntity>> brandResult = brandFeign.getBrandById(String.join(",", brandIdList));
+
+        return brandResult.getData();
+
+    }
+
+    /**
+     *  brand 数据
+     * @param aggregations
+     * @return
+     */
+    private List<CategoryEntity> getBrandList(Aggregations aggregations){
+
+        Terms categoryId_agg = aggregations.get("categoryId_agg");
+        // getBuckets（桶） 数据
+        List<String> categoryIdList = categoryId_agg.getBuckets()
+                .stream().map(catgeory -> catgeory.getKeyAsString()).collect(Collectors.toList());
+
+        Result<List<CategoryEntity>> categoryResult = categoryFeign.getCategoryById(String.join(",",categoryIdList));
+
+        return categoryResult.getData();
+    }
+
+    @Override
+    public Result<JSONObject> deleteESData() {
+        IndexOperations indexOperations = elasticsearchRestTemplate.indexOps(GoodsDocument.class);
+        if(indexOperations.exists()){
+            indexOperations.delete();
+        }
+
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<JSONObject> saveESData() {
+
+        IndexOperations indexOperations = elasticsearchRestTemplate.indexOps(GoodsDocument.class);
+
+        if(!indexOperations.exists()){
+            indexOperations.create();
+            indexOperations.createMapping();
+        }
+
+        List<GoodsDocument> goodsDocuments = this.esDocument();
+
+        elasticsearchRestTemplate.save(goodsDocuments);
+
+        return this.setResultSuccess();
+    }
+
+    public List<GoodsDocument> esDocument() {
 
         SpuDTO spuDTO = new SpuDTO();
-        spuDTO.setRows(5);
-        spuDTO.setPage(1);
+        List<GoodsDocument> goodsDocuments = new ArrayList<>();
+//        spuDTO.setRows(5);
+//        spuDTO.setPage(1);
         Result<List<SpuDTO>> listSpuResult = searchFeign.list2(spuDTO);
         if (listSpuResult.getCode() == HttpStatus.SC_OK) {
 
@@ -66,33 +216,32 @@ public class ShopElasticsearchServiceImpl extends BeanApiService implements Shop
                 goodsDocument.setSubTitle(spuDTO1.getSubTitle());
                 goodsDocument.setTitle(spuDTO1.getTitle());
 
+                //sku与price价格的数据
                 Map<List<Long>, List<Map<String, Object>>> listListMap = this.getPriceAndSku(spuDTO1.getId());
 
                 listListMap.forEach((key ,value) -> {
                     // 将sku数据转成json字符串放进Document中
-                    goodsDocument.setSkus(JSONObject.toJSONString(value));
+                    goodsDocument.setSkus(JSONUtil.toJsonString(value));
                     goodsDocument.setPrice(key);
                 });
 
+                //规格的数据
                 Map<String, Object> hashMapSpecs = this.getHashMapSpecs(spuDTO1);
 
                 goodsDocument.setSpecs(hashMapSpecs);
 
                 System.out.println(goodsDocument);
-
+                goodsDocuments.add(goodsDocument);
             });
-
         }
-
-        return null;
+        return goodsDocuments;
     }
 
     private Map<List<Long>,  List<Map<String, Object>>> getPriceAndSku(Integer spuId){
 
-
         Map<List<Long>,  List<Map<String, Object>>> listMapMap = new HashMap<>();
 
-        Map<String, Object>  skus  = new HashMap<>();
+
         //装的是price全部数据
         List<Long> prices = new ArrayList<>();
 
@@ -102,7 +251,7 @@ public class ShopElasticsearchServiceImpl extends BeanApiService implements Shop
 
         if(skuResultList.getCode() == HttpStatus.SC_OK){
             collect = skuResultList.getData().stream().map(sku -> {
-
+                Map<String, Object>  skus  = new HashMap<>();
                 skus.put("id",sku.getId());
                 skus.put("price", sku.getPrice());
                 skus.put("images", sku.getImages());

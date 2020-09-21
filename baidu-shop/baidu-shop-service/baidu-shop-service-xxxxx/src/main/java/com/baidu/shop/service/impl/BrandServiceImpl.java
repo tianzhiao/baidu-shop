@@ -76,6 +76,17 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
         return this.setResultSuccess(pageInfo);
     }
 
+
+    @Override
+    public Result<List<BrandEntity>> getBrandById(String brandIdStrs) {
+
+        List<Integer> brandIdList = Arrays.asList(brandIdStrs.split(",")).
+                stream().map(brandId -> Integer.parseInt(brandId)).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandMapper.selectByIdList(brandIdList);
+
+        return this.setResultSuccess(brandEntities);
+    }
+
     @Transactional
     @Override
     public Result<JsonObject> save(BrandDTO brandDTO) {

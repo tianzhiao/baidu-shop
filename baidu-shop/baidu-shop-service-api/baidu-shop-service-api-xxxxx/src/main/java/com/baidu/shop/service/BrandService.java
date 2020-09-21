@@ -47,4 +47,9 @@ public interface BrandService {
     @ApiOperation(value = "通过cid 查询")
     @GetMapping("/item/spec/brand")
     Result<List<BrandEntity>> list(Integer cid);
+
+
+    @ApiOperation(value = "通过主键去查询")
+    @GetMapping("/brand/getBrandById")
+    Result<List<BrandEntity>> getBrandById(@RequestParam String brandIdStrs);
 }

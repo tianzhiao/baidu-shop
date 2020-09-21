@@ -1,6 +1,8 @@
 package com.baidu.shop.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.responsoe.GoodsResponse;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +18,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Api(tags = "ES测试接口")
 public interface ShopESService {
 
-    @ApiOperation(value = "openfeign测试")
+  /*  @ApiOperation(value = "openfeign测试")
     @GetMapping("/test")
-    Result<JsonObject> test();
+    Result<JsonObject> test();*/
+
+    @ApiOperation(value = "删除es库")
+    @GetMapping("/es/delete")
+    Result<JSONObject> deleteESData();
+
+    @ApiOperation(value = "添加es数据")
+    @GetMapping("/es/saveAll")
+    Result<JSONObject> saveESData();
+
+
+    @ApiOperation(value = "查询")
+    @GetMapping("/es/search")
+    GoodsResponse esSearch(String search, Integer page);
 }

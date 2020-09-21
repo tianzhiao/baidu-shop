@@ -42,4 +42,8 @@ public interface CategoryService {
     @DeleteMapping("/cat/delete")
     Result<JSONObject> save(Integer id);
 
+
+    @ApiOperation(value = "通过分类主键去查询")
+    @GetMapping("/cat/getCategoryById")
+    Result<List<CategoryEntity>> getCategoryById(@RequestParam String catIdStrs);
 }
