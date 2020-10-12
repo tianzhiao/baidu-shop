@@ -14,13 +14,12 @@ import com.baidu.shop.mapper.SpecGroupMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.utlis.ObjectUtil;
 import com.baidu.shop.utlis.StringUtil;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,7 +54,6 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
 
         List<CategoryEntity> categoryEntities = mapper.selectByIdList(Arrays.asList(catIdStrs.split(","))
                 .stream().map(catId -> Integer.parseInt(catId)).collect(Collectors.toList()));
-
         return this.setResultSuccess(categoryEntities);
     }
 
@@ -71,6 +69,7 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
         return this.setResultSuccess(select);
     }
 
+    @Transactional
     @Override
     public Result<JSONObject> save(CategoryEntity categoryEntity) {
 
@@ -101,8 +100,6 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
     String msg = "";
     @Override
     public Result<JSONObject> save(Integer id) {
-
-
 
         CategoryEntity categoryEntity = mapper.selectByPrimaryKey(id);
         if(null == categoryEntity){//创建

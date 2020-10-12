@@ -18,6 +18,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.JsonObject;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
@@ -56,26 +57,40 @@ public class BrandServiceImpl extends BeanApiService implements BrandService {
     }
 
     @Override
+    @ResponseBody
     public Result<PageInfo<List<BrandEntity>>> getBrandInfo(BrandDTO brandDTO) {
 
-        PageHelper.startPage(brandDTO.getPage(), brandDTO.getRows());
+        if(brandDTO.getPage() != null && brandDTO.getRows() != null)
+            PageHelper.startPage(brandDTO.getPage(), brandDTO.getRows());
 
         Example example = new Example(BrandEntity.class);
+        Example.Criteria criteria = example.createCriteria();
 
         if (brandDTO.getDescending() != null) example
                 .setOrderByClause(brandDTO.getOrderByClause());
+        if(StringUtil.isIntNotNull(brandDTO.getId()))
+            criteria.andEqualTo("id",brandDTO.getId());
 
         if (null != brandDTO.getName() && !"".equals(brandDTO.getName()))
-            example.createCriteria()
-                    .andLike("name", "%" + brandDTO.getName() + "%");
+            criteria.andLike("name", "%" + brandDTO.getName() + "%");
 
         List<BrandEntity> brandEntities = brandMapper.selectByExample(example);
 
+
         PageInfo<List<BrandEntity>> pageInfo = new PageInfo(brandEntities);
 
-        return this.setResultSuccess(pageInfo);
+        Result<PageInfo<List<BrandEntity>>> pageInfoResult = new Result<>();
+        pageInfoResult.setCode(200);
+        pageInfoResult.setMessage("success");
+        pageInfoResult.setData(pageInfo);
+
+        return pageInfoResult;
     }
 
+    @Override
+    public BrandEntity getBrandInfo2(BrandDTO brandDTO) {
+        return brandMapper.selectByPrimaryKey(brandDTO.getId());
+    }
 
     @Override
     public Result<List<BrandEntity>> getBrandById(String brandIdStrs) {

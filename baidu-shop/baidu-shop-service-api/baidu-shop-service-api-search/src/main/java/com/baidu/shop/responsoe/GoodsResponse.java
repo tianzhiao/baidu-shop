@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,7 +31,9 @@ public class GoodsResponse extends Result<List<GoodsDocument>> {
     private List<BrandEntity> brandList;
 
 
-    public GoodsResponse(Long total,Long totalPage,List<CategoryEntity> catList ,List<BrandEntity> brandList,List<GoodsDocument> goodsDocuments){
+    private HashMap<String, List<String>> specResultList;
+
+    public GoodsResponse(Long total,Long totalPage,List<CategoryEntity> catList ,List<BrandEntity> brandList,List<GoodsDocument> goodsDocuments,HashMap<String, List<String>> specResultList){
 
         super(HttpStatus.SC_OK, HttpStatus.SC_OK + "", goodsDocuments);
 
@@ -38,6 +41,7 @@ public class GoodsResponse extends Result<List<GoodsDocument>> {
         this.brandList = brandList;
         this.catList = catList;
         this.totalPage = totalPage;
+        this.specResultList = specResultList;
     }
 
 }

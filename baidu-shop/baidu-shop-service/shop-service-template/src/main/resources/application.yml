@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: template-server
+  thymeleaf:
+    prefix: classpath:templates/
+    check-template-location: true
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    mode: HTML5
+    cache: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+server:
+  port: 8004
+
+mrshop:
+  static:
+    html:
+      path: T:\static-html\item #生成的html文件存储的路径

@@ -5,19 +5,25 @@ import com.baidu.shop.base.BeanApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
-import com.baidu.shop.dto.SpuDetailDTO;
 import com.baidu.shop.entity.SkuEntity;
 import com.baidu.shop.entity.SpuDetailEntity;
 import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.entity.StockEntity;
+import com.baidu.shop.feign.SearchFeign;
+import com.baidu.shop.feign.TemplateFeign;
 import com.baidu.shop.mapper.*;
 import com.baidu.shop.service.GoodsService;
 import com.baidu.shop.utlis.BaiduBeanUtil;
 import com.baidu.shop.utlis.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.gson.JsonObject;
+import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
@@ -42,13 +48,6 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     @Resource
     private SpuMapper spuMapper;
 
-    @Resource
-    private BrandMapper brandMapper;
-
-    //分类
-    @Resource
-    private CategoryMapper categoryMapper;
-
     //库存
     @Resource
     private StockMapper stockMapper;
@@ -56,15 +55,42 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     @Resource
     private SkuMapper skuMapper;
 
+    @Autowired
+    private TemplateFeign templateFeign;
     //细节
     @Resource
     private SpuDetailMapper spuDetailMapper;
 
-    @Transactional
+    @Resource
+    private SearchFeign searchFeign;
+
+    @Override
+    public SpuEntity bySpuId(Integer spuId) {
+
+        SpuEntity spuEntity = spuMapper.selectByPrimaryKey(spuId);
+
+        return spuEntity;
+    }
+
+
     @Override
     public Result<Result<JSONObject>> add(SpuDTO spuDTO) {
+        //带着事务返回数据
+        GoodsServiceImpl goodsService = (GoodsServiceImpl) AopContext.currentProxy();
+        Integer spuId = goodsService.addGoodsDataReturnSpuId(spuDTO);
+        //新增一个静态页面
+        templateFeign.createStaticHTMLTemplate(spuId);
 
+        return this.setResultSuccess();
+    }
 
+    /**
+     * 新增商品数据
+     * @param spuDTO
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Integer addGoodsDataReturnSpuId(SpuDTO spuDTO) {
         Date date = new Date();
         /**
          *
@@ -114,7 +140,16 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
             stockMapper.insertSelective(stockEntity);
         });
 
-        return this.setResultSuccess();
+        //事务执行完成之后执行
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                super.afterCommit();
+                //新增search数据 根据指定的spuId 去查询 然后新增
+                searchFeign.getGoodsSearchSave(spuEntity.getId());
+            }
+        });
+        return spuEntity.getId();
     }
 
     /**
@@ -178,8 +213,6 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     @Override
     public Result<Result<JSONObject>> edit(SpuDTO spuDTO) {
 
-        System.out.println(spuDTO);
-
         Date date = new Date();
         // 修改spu
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -236,17 +269,26 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
 
     }
 
+    //删除商品数据
     @Transactional
     @Override
     public Result<JSONObject> delete(Integer spuId) {
 
-        //删除 spu
-        spuMapper.deleteByPrimaryKey(spuId);
-        //删除 detail
-        spuDetailMapper.deleteByPrimaryKey(spuId);
-        //删除 sku
-        //删除 stock
-        this.del(spuId);
+        try {
+            //删除 spu
+            spuMapper.deleteByPrimaryKey(spuId);
+            //删除 detail
+            spuDetailMapper.deleteByPrimaryKey(spuId);
+            //删除 sku
+            //删除 stock
+            this.del(spuId);
+            //同时删除静态模板数据 & se 数据
+            searchFeign.deleteGoodsById(spuId);
+            log.debug("删除数据成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.debug("删除数据成功:{}",e.getMessage());
+        }
 
         return this.setResultSuccess();
     }

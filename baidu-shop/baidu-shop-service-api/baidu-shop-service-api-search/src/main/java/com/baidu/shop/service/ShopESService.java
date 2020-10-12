@@ -6,6 +6,7 @@ import com.baidu.shop.responsoe.GoodsResponse;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -33,5 +34,13 @@ public interface ShopESService {
 
     @ApiOperation(value = "查询")
     @GetMapping("/es/search")
-    GoodsResponse esSearch(String search, Integer page);
+    GoodsResponse esSearch(String search, Integer page,String filter);
+
+    @ApiOperation(value = "新增数据search")
+    @GetMapping("/es/getSearch")
+    Result<JsonObject> getGoodsSearchSave(Integer spuId);
+
+    @ApiOperation("删除Goods 数据根据主键")
+    @DeleteMapping("/es/deleteSearchGoods")
+    Result<JSONObject> deleteGoodsById(Integer id);
 }

@@ -35,6 +35,10 @@
             and saleable = #{saleable}
         </if>
 
+        <if test="id != null ">
+            and s.id = #{id}
+        </if>
+
         <if test="title != null and title != ''">
             and title like CONCAT('%',#{title} ,'%')
         </if>

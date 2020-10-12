@@ -60,4 +60,8 @@ public interface GoodsService {
     @ApiOperation(value = "修改状态--下架")
     @PutMapping("/goods/outof")
     Result<JsonObject> outOf(@RequestBody SpuEntity spuEntity);
+
+    @ApiOperation(value = "通过主键去查寻")
+    @PutMapping("/goods/bySpuId")
+    SpuEntity bySpuId(Integer spuId);
 }

@@ -1,5 +1,6 @@
 package com.baidu.shop.dto;
 
+import com.baidu.shop.entity.SpecParamsEntity;
 import com.baidu.shop.validata.group.BaiduOperation;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
@@ -8,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Id;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @ClassName SpecificationDTO
@@ -31,6 +33,27 @@ public class SpecGroupDTO {
     @NotEmpty(message = "商品分类id不能为空",groups = BaiduOperation.Add.class)
     private String name;
 
+    @ApiModelProperty(hidden = true)
+    private  List<SpecParamsEntity> specParamsEntityList;
+
+    public List<SpecParamsEntity> getSpecParamsEntityList() {
+        return specParamsEntityList;
+    }
+
+    public void setSpecParamsEntityList(List<SpecParamsEntity> specParamsEntityList) {
+        this.specParamsEntityList = specParamsEntityList;
+    }
+
+    @ApiModelProperty(hidden = true)
+    private List<SpecParamsEntity> specParamsList;
+
+    public List<SpecParamsEntity> getSpecParamsList() {
+        return specParamsList;
+    }
+
+    public void setSpecParamsList(List<SpecParamsEntity> specParamsList) {
+        this.specParamsList = specParamsList;
+    }
 
     public Integer getId() {
         return id;

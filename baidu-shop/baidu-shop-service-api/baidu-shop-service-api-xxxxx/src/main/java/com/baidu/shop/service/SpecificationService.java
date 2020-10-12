@@ -28,7 +28,7 @@ public interface SpecificationService {
     //================================分组查询====================================
     @GetMapping("/specification/list")
     @ApiOperation(value = "查寻")
-    Result<List<SpecGroupEntity>> list(@Validated({BaiduOperation.Update.class}) SpecGroupEntity specificationDTO);
+    Result<List<SpecGroupEntity>> list(@Validated({BaiduOperation.Update.class}) @SpringQueryMap SpecGroupEntity specificationDTO);
 
     @PostMapping("/specification/save")
     @ApiOperation(value = "新增")

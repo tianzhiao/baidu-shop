@@ -1,5 +1,7 @@
 server:
   port: 8100
+  compression:
+    enabled: false
 
 spring:
   application:
@@ -41,7 +43,7 @@ mapper:
 logging:
   level:
     # 打印与我们程序相关的日志信息
-    com.baidu.shop: debug
+    com.baidu.shop: info
 # eureka配置
 eureka:
   client:

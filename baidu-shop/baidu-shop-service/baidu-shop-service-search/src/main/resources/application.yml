@@ -6,3 +6,7 @@ spring:
       uris: 101.200.56.190:9200
   application:
     name: search-server
+
+
+tianzhiao:
+  path: T:\static-html\item\
