@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
+import com.baidu.shop.entity.SkuEntity;
 import com.baidu.shop.entity.SpuDetailEntity;
 import com.baidu.shop.entity.SpuEntity;
 import com.baidu.shop.validata.group.BaiduOperation;
@@ -64,4 +65,13 @@ public interface GoodsService {
     @ApiOperation(value = "通过主键去查寻")
     @PutMapping("/goods/bySpuId")
     SpuEntity bySpuId(Integer spuId);
+
+    @ApiOperation(value = "通过skuId去查询")
+    @GetMapping("/goods/skuId")
+    Result<SkuEntity> getBySkuId(@RequestParam Long skuId);
+
+
+    @ApiOperation(value = "更新stock")
+    @GetMapping("/stock/edit")
+    Result<JSONObject> edit(@RequestParam Long skuId,@RequestParam Long num);
 }

@@ -18,6 +18,12 @@
         <module>baidu-shop-service-api-xxxxx</module>
         <module>baidu-shop-service-api-search</module>
         <module>baidu-shop-service-api-template</module>
+        <module>baidu-shop-service-api-user</module>
+        <module>baidu-shop-service-api-car</module>
+        <module>baidu-shop-order-service-api</module>
+        <module>baidu-shop-service-api-pay</module>
+        <module>baidu-shop-service-api-addr</module>
+        <module>baidu-shop-service-api-seckiil</module>
     </modules>
 
     <dependencies>

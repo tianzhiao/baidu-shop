@@ -52,4 +52,11 @@ public class SkuDTO {
     @ApiModelProperty(value = "库存")
     private Integer stock;
 
+    @ApiModelProperty(value = "可秒杀库存", example = "1")
+    private Integer seckillStock;
+
+    @ApiModelProperty(value = "秒杀总数量", example = "1")
+    private Integer seckillTotal;
+
+
 }

@@ -3,6 +3,8 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BeanApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.BaiduRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.entity.SkuEntity;
@@ -17,7 +19,6 @@ import com.baidu.shop.utlis.BaiduBeanUtil;
 import com.baidu.shop.utlis.StringUtil;
 import com.github.pagehelper.PageHelper;
 import com.google.gson.JsonObject;
-import com.netflix.discovery.converters.Auto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,9 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     @Resource
     private SearchFeign searchFeign;
 
+    @Resource
+    private BaiduRabbitMQ baiduRabbitMQ;
+
     @Override
     public SpuEntity bySpuId(Integer spuId) {
 
@@ -77,9 +81,9 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
     public Result<Result<JSONObject>> add(SpuDTO spuDTO) {
         //带着事务返回数据
         GoodsServiceImpl goodsService = (GoodsServiceImpl) AopContext.currentProxy();
-        Integer spuId = goodsService.addGoodsDataReturnSpuId(spuDTO);
+        goodsService.addGoodsDataReturnSpuId(spuDTO);
         //新增一个静态页面
-        templateFeign.createStaticHTMLTemplate(spuId);
+        //templateFeign.createStaticHTMLTemplate(spuId);
 
         return this.setResultSuccess();
     }
@@ -147,6 +151,8 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
                 super.afterCommit();
                 //新增search数据 根据指定的spuId 去查询 然后新增
                 searchFeign.getGoodsSearchSave(spuEntity.getId());
+
+                baiduRabbitMQ.send(spuEntity.getId().toString(), MqMessageConstant.SPU_ROUT_KEY_SAVE);
             }
         });
         return spuEntity.getId();
@@ -249,6 +255,7 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
             stockMapper.insertSelective(stockEntity);
         });
 
+        baiduRabbitMQ.send(spuDTO.getId().toString(), MqMessageConstant.SPU_ROUT_KEY_UPDATE);
 
         return this.setResultSuccess();
     }
@@ -285,6 +292,9 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
             //同时删除静态模板数据 & se 数据
             searchFeign.deleteGoodsById(spuId);
             log.debug("删除数据成功");
+
+            baiduRabbitMQ.send(spuId.toString(),MqMessageConstant.SPU_ROUT_KEY_DELETE);
+
         } catch (Exception e) {
             e.printStackTrace();
             log.debug("删除数据成功:{}",e.getMessage());
@@ -312,6 +322,16 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
         return this.setResultSuccess();
     }
 
+    /**
+     * 通过skuId查询sku数据
+     * @param skuId
+     * @return
+     */
+    @Override
+    public Result<SkuEntity> getBySkuId(Long skuId) {
+        SkuEntity skuEntity = skuMapper.selectByPrimaryKey(skuId);
+        return this.setResultSuccess(skuEntity);
+    }
 
     /**
      *   List<SpuDTO> listBySpuId = spuMapper.getListBySpuId(spuDTO);
@@ -359,4 +379,16 @@ public class GoodsServiceImpl extends BeanApiService implements GoodsService {
 
         PageInfo<SpuDTO> spuEntityPageInfo = new PageInfo(spuEntities);
 */
+
+    @Transactional
+    @Override
+    public Result<JSONObject> edit(Long skuId, Long num) {
+
+        try {
+            stockMapper.editStockTableOfStock(skuId,num);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this.setResultSuccess();
+    }
 }

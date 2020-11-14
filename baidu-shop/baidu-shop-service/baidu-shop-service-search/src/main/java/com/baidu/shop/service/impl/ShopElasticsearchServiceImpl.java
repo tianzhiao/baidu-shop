@@ -31,6 +31,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.IndexOperations;
@@ -256,6 +257,7 @@ public class ShopElasticsearchServiceImpl extends BeanApiService implements Shop
         List<Integer> hotCid = Arrays.asList(0);
         List<Long> maxCount = Arrays.asList(0L);
 
+
         // getBuckets（桶） 数据
         List<String> categoryIdList = categoryId_agg.getBuckets()
                 .stream().map(catgeory -> {
@@ -301,6 +303,11 @@ public class ShopElasticsearchServiceImpl extends BeanApiService implements Shop
         return this.setResultSuccess();
     }
 
+    /**
+     * 新增es数据
+     * @param spuId
+     * @return
+     */
     @Override
     public Result<JsonObject> getGoodsSearchSave(Integer spuId) {
 

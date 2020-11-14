@@ -97,6 +97,9 @@ public class SpecificationServiceImpl extends BeanApiService implements Specific
 
         if(specParamsDTO.getGeneric() != null)
             criteria.andEqualTo("generic",specParamsDTO.getGeneric());
+
+        if(specParamsDTO.getId() != null)
+            criteria.andEqualTo("id",specParamsDTO.getId());
         List<SpecParamsEntity> specParamsEntities = paramsMapper.selectByExample(example);
 
         return this.setResultSuccess(specParamsEntities);

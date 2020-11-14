@@ -14,6 +14,9 @@ import com.baidu.shop.mapper.SpecGroupMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.utlis.ObjectUtil;
 import com.baidu.shop.utlis.StringUtil;
+import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
  **/
 
 @RestController
+@Scope()
 public class CategoryServiceImpl extends BeanApiService implements CategoryService {
 
     /**
@@ -48,6 +52,7 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
 
     @Resource
     private SpecGroupMapper specGroupMapper;
+
 
     @Override
     public Result<List<CategoryEntity>> getCategoryById(String catIdStrs) {
@@ -69,7 +74,8 @@ public class CategoryServiceImpl extends BeanApiService implements CategoryServi
         return this.setResultSuccess(select);
     }
 
-    @Transactional
+    //(isolation = Isolation.REPEATABLE_READ,propagation = Propagation.REQUIRED)
+    @Transactional(isolation = Isolation.REPEATABLE_READ,propagation = Propagation.REQUIRED)
     @Override
     public Result<JSONObject> save(CategoryEntity categoryEntity) {
 

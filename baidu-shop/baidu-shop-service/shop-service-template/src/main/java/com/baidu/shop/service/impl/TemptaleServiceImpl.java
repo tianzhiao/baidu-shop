@@ -63,7 +63,7 @@ public class TemptaleServiceImpl extends BeanApiService implements TemplateServi
         PrintWriter printWriter = null;
         try {
             printWriter = new PrintWriter(file,"UTF-8");
-            templateEngine.process("item",context,printWriter);
+            templateEngine.process("item1",context,printWriter);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

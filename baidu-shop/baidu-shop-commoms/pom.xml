@@ -15,5 +15,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>baidu-shop-commoms-core</module>
+        <module>baidu-shop-common-oauth</module>
     </modules>
 </project>

@@ -4,6 +4,20 @@ server:
     enabled: false
 
 spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    # 是否确认回调
+    publisher-confirm-type: correlated
+    # 是否返回回调
+    publisher-returns: true
+    virtual-host: /
+    # 手动确认
+    listener:
+      simple:
+        acknowledge-mode: manual
   application:
     name: xxx-service
   # 配置数据源
@@ -54,3 +68,7 @@ eureka:
 mybatis:
   mapper-locations:
     - classpath:mapper/*xml
+  configuration:
+    map-underscore-to-camel-case: true
+    # interceptors:
+

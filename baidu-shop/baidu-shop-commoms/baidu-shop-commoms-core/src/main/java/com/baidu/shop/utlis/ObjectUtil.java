@@ -23,5 +23,10 @@ public class ObjectUtil {
         return null != str && !"".equals(str);
     }
 
+    public static Boolean isObj(Object o){
+
+        return o == null || o == "" || o.equals("");
+    }
+
 
 }

@@ -35,6 +35,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+
+       <!--  https://mvnrepository.com/artifact/org.clojure/tools.deps.alpha
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>tools.deps.alpha</artifactId>
+            <version>0.9.828</version>
+        </dependency>-->
+
     </dependencies>
 
 

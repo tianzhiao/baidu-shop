@@ -19,4 +19,6 @@ public class HTTPStatus {
      * 表示 参数 验证失败
      */
     public static final Integer PARAMS_VALIDATE_ERROR = 40000;
+
+    public static final Integer PHONE_ERROR = 506;
 }

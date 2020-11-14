@@ -18,6 +18,12 @@
         <module>baidu-shop-service-xxxxx</module>
         <module>baidu-shop-service-search</module>
         <module>shop-service-template</module>
+        <module>baidu-shop-service-user</module>
+        <module>baidu-shop-service-car</module>
+        <module>baidu-shop-order-service</module>
+        <module>baidu-shop-service-payment</module>
+        <module>baidu-shop-service-addr</module>
+        <module>baidu-shop-service-seckill</module>
     </modules>
 
     <dependencies>
@@ -65,6 +71,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+    <!--rabbitmq-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
 
     </dependencies>
 
